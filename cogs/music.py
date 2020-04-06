@@ -210,7 +210,7 @@ class Music(commands.Cog):
 
     @commands.command(name = "connect", aliases = ["join"])
     async def connect_(self, ctx, *, channel: discord.VoiceChannel=None):
-        """Connect to a voice channel."""
+        """Join a voice channel"""
         if not channel:
             try:
                 channel = ctx.author.voice.channel
@@ -234,14 +234,7 @@ class Music(commands.Cog):
 
     @commands.command(name='play', aliases=['sing'])
     async def play_(self, ctx, *, search: str):
-        """Request a song and add it to the queue.
-        This command attempts to join a valid voice channel if the bot is not already in one.
-        Uses YTDL to automatically search and retrieve a song.
-        Parameters
-        ------------
-        search: str [Required]
-            The song to search and retrieve using YTDL. This could be a simple search, an ID or URL.
-        """
+        """Play a song from YouTube, use link or title"""
         await ctx.trigger_typing()
 
         vc = ctx.voice_client
@@ -263,7 +256,9 @@ class Music(commands.Cog):
         vc = ctx.voice_client
 
         if not vc or not vc.is_playing():
-            return await ctx.send('I am not currently playing anything!', delete_after=20)
+            emb = discord.Embed(description = "I'm not playing anything.", colour = discord.Colour.red())
+            return await ctx.send(embed = emb)
+
         elif vc.is_paused():
             return
 
@@ -276,7 +271,9 @@ class Music(commands.Cog):
         vc = ctx.voice_client
 
         if not vc or not vc.is_connected():
-            return await ctx.send('I am not currently playing anything!', delete_after=20)
+            emb = discord.Embed(description = "I'm not playing anything.", colour = discord.Colour.red())
+            return await ctx.send(embed = emb)
+
         elif not vc.is_paused():
             return
 
@@ -289,7 +286,8 @@ class Music(commands.Cog):
         vc = ctx.voice_client
 
         if not vc or not vc.is_connected():
-            return await ctx.send('I am not currently playing anything!', delete_after=20)
+            emb = discord.Embed(description = "I'm not playing anything.", colour = discord.Colour.red())
+            return await ctx.send(embed = emb)
 
         if vc.is_paused():
             pass
@@ -297,11 +295,10 @@ class Music(commands.Cog):
             return
 
         vc.stop()
-        await ctx.send(f'**`{ctx.author}`**: Skipped the song!')
 
     @commands.command(name='queue', aliases=['q', 'playlist'])
     async def queue_info(self, ctx):
-        """Retrieve a basic queue of upcoming songs."""
+        """See songs' queue"""
         vc = ctx.voice_client
 
         if not vc or not vc.is_connected():
@@ -322,7 +319,7 @@ class Music(commands.Cog):
 
     @commands.command(name='now_playing', aliases=['np', 'current', 'currentsong', 'playing'])
     async def now_playing_(self, ctx):
-        """Display information about the currently playing song."""
+        """Info about the now playing song"""
         vc = ctx.voice_client
 
         if not vc or not vc.is_connected():
@@ -362,10 +359,7 @@ class Music(commands.Cog):
 
     @commands.command(name='stop', aliases = ["dc", "leave", "disconnect"])
     async def stop_(self, ctx):
-        """Stop the currently playing song and destroy the player.
-        !Warning!
-            This will destroy the player assigned to your guild, also deleting any queued songs and settings.
-        """
+        """Stop the currently playing song."""
         vc = ctx.voice_client
 
         if not vc or not vc.is_connected():

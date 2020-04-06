@@ -36,9 +36,28 @@ class Help(commands.Cog):
 
                   pass
 
-          emb = discord.Embed(title = "Help", colour = discord.Colour.blurple(), timestamp = ctx.message.created_at)
+          misc = ""
+
+          for a in self.bot.commands:
+            if a.cog_name == "Misc":
+              if not a.hidden:
+
+                misc += f"`{a.name} {a.signature}` - {a.help}\n"
+
+                try:
+                  
+                  for b in a.commands:
+
+                    misc += f"`{a.name} {b.name} {b.signature}` - {b.help}\n"
+
+                except:
+
+                  pass
+
+          emb = discord.Embed(title = "Help", colour = discord.Colour.blurple(), timestamp = ctx.message.created_at, description = "Prefix: `namb!`")
           emb.set_author(name = ctx.author.name, icon_url = ctx.author.avatar_url_as(static_format = "png"))
           emb.add_field(name = "Music", value = music, inline = False)
+          emb.add_field(name = "Misc", value = misc, inline = False)
           emb.set_footer(text = ctx.guild.name, icon_url = ctx.guild.icon_url_as(static_format = "png"))
 
           return await ctx.send(embed = emb)

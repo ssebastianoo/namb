@@ -192,8 +192,7 @@ class Music(commands.Cog):
             except discord.HTTPException:
                 pass
         elif isinstance(error, InvalidVoiceChannel):
-            await ctx.send('Error connecting to Voice Channel. '
-                           'Please make sure you are in a valid channel or provide me with one')
+            await ctx.send('Error connecting to Voice Channel. Please make sure you are in a valid channel or provide me with one')
 
         print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
         traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
@@ -232,23 +231,32 @@ class Music(commands.Cog):
             except asyncio.TimeoutError:
                 raise VoiceConnectionError(f'Connecting to channel: <{channel}> timed out.')
 
-    @commands.command(name='play', aliases=['sing'])
+    @commands.command(name='play', aliases=['sing', 'p'])
     async def play_(self, ctx, *, search: str):
         """Play a song from YouTube, use link or title"""
-        await ctx.trigger_typing()
 
-        vc = ctx.voice_client
+        emb = discord.Embed(description = f"Searching **{search}**...", colour = 0xf6ff00)
+        msg = await ctx.send(embed = emb)
+        
+        async with ctx.typing():
 
-        if not vc:
-            await ctx.invoke(self.connect_)
+            vc = ctx.voice_client
 
-        player = self.get_player(ctx)
+            if not vc:
+                await ctx.invoke(self.connect_)
 
-        # If download is False, source will be a dict which will be used later to regather the stream.
-        # If download is True, source will be a discord.FFmpegPCMAudio with a VolumeTransformer.
-        source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop, download=False)
+            player = self.get_player(ctx)
 
+        try:
+            async with timeout(2):
+                source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop, download=True)
+        
+        except:
+            source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop, download=False)
+            
+        await msg.delete()
         await player.queue.put(source)
+            
 
     @commands.command(name='pause')
     async def pause_(self, ctx):

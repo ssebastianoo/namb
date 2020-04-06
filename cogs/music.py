@@ -263,7 +263,8 @@ class Music(commands.Cog):
             return
 
         vc.pause()
-        await ctx.send(f'**`{ctx.author}`**: Paused the song!')
+        emb = discord.Embed(description = "⏸️Paused", colour = discord.Colour.dark_green())
+        await ctx.send(embed = emb)
 
     @commands.command(name='resume')
     async def resume_(self, ctx):
@@ -278,7 +279,8 @@ class Music(commands.Cog):
             return
 
         vc.resume()
-        await ctx.send(f'**`{ctx.author}`**: Resumed the song!')
+        emb = discord.Embed(description = "▶️Resumed", colour = discord.Colour.dark_green())
+        await ctx.send(embed = emb)
 
     @commands.command(name='skip')
     async def skip_(self, ctx):
@@ -366,6 +368,9 @@ class Music(commands.Cog):
             return await ctx.send('I am not currently playing anything!', delete_after=20)
 
         await self.cleanup(ctx.guild)
+
+        emb = discord.Embed(description = "👋Bye", colour = discord.Colour.dark_teal())
+        await ctx.send(embed = emb)
 
 
 def setup(bot):
